@@ -16,7 +16,7 @@ function getComputerChoice(){
 function convertToWord(letter){
     if(letter === "r") return "Rock";
     if(letter === "p") return "Paper";
-    return "Scissors";
+    return "Scissor";
 }
 function win(userChoice, computerChoice){
     const smallUserword = "user".fontsize(3).sub();
