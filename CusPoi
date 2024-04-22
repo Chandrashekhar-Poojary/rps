@@ -1,0 +1,410 @@
+=============ExcelUtils==============
+
+
+import java.io.*;
+
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.FileInputStream;
+
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.util.*;
+
+import org.apache.poi.xssf.usermodel.XSSFCell;
+
+import org.apache.poi.xssf.usermodel.XSSFRow;
+
+
+
+public class ExcelUtils  //Do not change the class name
+
+{  
+
+	public static XSSFSheet worksheet;
+
+	public static XSSFWorkbook workbook;
+
+	public static FileInputStream work_file;
+
+	public static String file_path;
+
+
+	public static String[] readExcelData(String sheetName) throws Exception {
+
+		//Get the excel file path
+
+		
+
+		//Using the sheet name passed to this method, read the data and store it in a string array
+
+
+		//use the string array to store the values from excel
+
+	
+
+		//use switch case for reading different datatypes
+
+		List<String> data = new ArrayList<>();
+
+            FileInputStream file = new FileInputStream("CustomerRegistration.xlsx");
+
+            Workbook workbook = WorkbookFactory.create(file);
+
+            Sheet sheet = workbook.getSheet(sheetName);
+
+            
+
+            for (Row row : sheet) {
+
+                for (Cell cell : row) {
+
+                    switch (cell.getCellTypeEnum()) {
+
+                        case STRING:
+
+                            data.add(cell.getStringCellValue());
+
+                            break;
+
+                        case NUMERIC:
+
+                            if (DateUtil.isCellDateFormatted(cell)) {
+
+                                data.add(cell.getDateCellValue().toString());
+
+                            } else {
+
+                                data.add(String.valueOf(cell.getNumericCellValue()));
+
+                            }
+
+                            break;
+
+                        case BOOLEAN:
+
+                            data.add(String.valueOf(cell.getBooleanCellValue()));
+
+                            break;
+
+                        case FORMULA:
+
+                            data.add(cell.getCellFormula());
+
+                            break;
+
+                        case BLANK:
+
+                            data.add("");
+
+                            break;
+
+                        default:
+
+                            data.add("Unsupported data type");
+
+                            break;
+
+                    }
+
+                }
+
+            }
+
+            workbook.close();
+
+            file.close();
+
+        return data.toArray(new String[0]);
+
+	}
+
+
+
+}
+
+
+
+========================TestCustomerRegistration ================
+
+
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+
+public class TestCustomerRegistration{
+
+    
+
+	//use the respective variable 
+
+	//do not change the method and variable declaration
+
+	public static WebDriver driver;
+
+
+	CustomerRegistration cust;
+
+	public static String successmsg;
+
+	public static String[] data;
+
+
+	public void setUp() {
+
+		//create the driver using method 'getDriver' in class DriverSetup.
+
+		//Assign it to the variable 'driver'
+
+  		driver = DriverSetup.getWebDriver();
+
+  		
+
+  		//do not change it
+
+  		cust=new CustomerRegistration(driver);
+
+
+	}
+
+
+	public static String[] getExcelData() throws Exception {
+
+
+		//Call the method 'readExcelData' in class 'ExcelUtils' using sheet name 'customer_valid'
+
+		//Return the value
+
+		
+
+		
+
+		
+
+		String[] data = ExcelUtils.readExcelData("customer_valid");
+
+		return data;
+
+	}
+
+
+
+	public void testValidSubmit() throws Exception {	
+
+	    
+
+	    //call the method getExcelData() and store the excel data in an array
+
+		//call the method required in class 'CustomerRegistration' and pass the excel data values
+
+		//submit the 
+
+		String[] str=getExcelData();
+
+		cust.setCustomerName(str[0]);
+
+		cust.setAge(str[1]);
+
+		cust.setAddress(str[2]);
+
+		cust.setPhoneNumber(str[3]);
+
+		cust.setEmail(str[4]);
+
+		cust.SubmitForm();
+
+    	successmsg=cust.SuccessMsg();
+
+		
+
+		
+
+		
+
+		
+
+		//Store the success message in a static variable 'successmsg'
+
+		
+
+	}
+
+	
+
+	public void closeBrowser() {
+
+		//close the browser
+
+		
+
+		driver.quit();
+
+		
+
+	}
+
+
+	public static void main(String[] args) throws Exception {
+
+		
+
+		TestCustomerRegistration test=new TestCustomerRegistration();
+
+		
+
+		/* implement your code here */
+
+	}
+
+}
+
+============================  CustomerRegistration ==========
+
+
+
+
+import org.openqa.selenium.Alert;
+
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.WebDriver;
+
+import org.openqa.selenium.WebElement;
+
+import org.openqa.selenium.support.ui.Select;
+
+
+public class CustomerRegistration {
+
+    
+
+	public static WebDriver driver;
+
+	public static WebElement element;
+
+	
+
+	//idetify each element using its respective locators
+
+	//eg:By name=By.name("name");
+
+	
+
+	public CustomerRegistration(){}
+
+	
+
+	//DO NOT change the constructor
+
+	public CustomerRegistration(WebDriver driver) {
+
+		this.driver= driver;
+
+	}
+
+    
+
+    public void setCustomerName(String name) {
+
+		// Locate the Web Element corresponding to the ‘Customer Name’ (TextField) using specific locators.            
+
+		// Pass the name as a parameter to this method                                               
+
+		// Use the sendKeys() method and fill the input box of the 'Customer Name' with 'name'
+
+		
+
+		driver.findElement(By.xpath("//*[@id='agent-form']/table/tbody/tr[1]/td[2]/input")).sendKeys(name);
+
+	}	
+
+    public void setAge(String age) {
+
+		// Locate the Web Element corresponding to the ‘Age’ (TextField) using specific locators.            
+
+		// Pass the age as a parameter to this method                                               
+
+		// Use the sendKeys() method and fill the input box of the ‘Age' with 'age'
+
+		driver.findElement(By.name("age")).sendKeys(age);
+
+	}
+
+
+	public void setAddress(String address) {
+
+		// Locate the Web Element corresponding to the ‘Address’ (TextField) using specific locators.            
+
+		// Pass the address as a parameter to this method                                               
+
+		// Use the sendKeys() method and fill the input box of the 'Address' with 'address'
+
+		driver.findElement(By.name("address")).sendKeys(address);
+
+		
+
+		
+
+	}	 	  	  		 	     	     	      	 	
+
+
+	public void setPhoneNumber(String phone) {
+
+		// Locate the Web Element corresponding to ‘Phone Number’ (TextField) using specific locators.
+
+		// Pass the phone as a parameter to this method                       
+
+		// Use the sendKeys() method and fill the input box of the 'Phone Number' with ‘phone’.
+
+			driver.findElement(By.name("phonenumber")).sendKeys(phone);
+
+		
+
+	}
+
+
+	public void setEmail(String email) {
+
+		// Locate the Web Element corresponding to the ‘Email’ using specific locators.                                 
+
+		// Pass the email as a parameter to this method.                                               
+
+		// Use the sendKeys() method and fill the input box of the 'Email' with ‘email'
+
+			driver.findElement(By.name("email")).sendKeys(email);
+
+	}
+
+
+	
+
+	public void SubmitForm() {
+
+		// Locate the Web Element corresponding to the ‘Submit’ (Button) using specific locators.
+
+		// Click the ‘Submit’ button and submit the form.
+
+		driver.findElement(By.id("submit")).click();
+
+	}
+
+	
+
+	public String SuccessMsg() {
+
+		// Locate the Web Element corresponding to the ‘Success Message’ using specific locators.
+
+		// return the ‘Success Message’ displayed after submit the form.
+
+		return driver.findElement(By.xpath("/html/body/h2")).getText();
+
+	}
+
+	
+
+
+}
