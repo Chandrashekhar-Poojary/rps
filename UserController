@@ -1,0 +1,61 @@
+package com.example.login.controller;
+
+import com.example.login.model.User;
+import com.example.login.repository.UserRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/login")
+public class LoginController {
+
+    private final UserRepository userRepository;
+
+    public LoginController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    /**
+     * Handles POST requests to /api/login for user login.
+     * Expects a JSON body with "username" and "password".
+     */
+    @PostMapping
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> loginData) {
+        String username = loginData.get("username");
+        String password = loginData.get("password");
+
+        User user = userRepository.findByUsername(username);
+
+        if (user == null || !user.getPassword().equals(password)) {
+            Map<String, String> response = new HashMap<>();
+            response.put("error", "Invalid username or password");
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Login successful");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    /**
+     * Handles GET requests to /api/login.
+     * Can be used to check login status or get user info after successful login.
+     */
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUserInfo(@PathVariable String username) {
+        User user = userRepository.findByUsername(username);
+
+        if (user == null) {
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }
+
+        Map<String, String> userInfo = new HashMap<>();
+        userInfo.put("id", user.getId().toString());
+        userInfo.put("username", user.getUsername());
+        return new ResponseEntity<>(userInfo, HttpStatus.OK);
+    }
+}
